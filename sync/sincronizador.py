@@ -1,0 +1,1 @@
+# Módulo de sincronización con la nube

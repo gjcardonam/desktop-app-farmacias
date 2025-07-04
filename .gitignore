@@ -1,0 +1,40 @@
+# Entornos virtuales
+venv/
+.env/
+.envrc
+*.env
+
+# Archivos de configuración de entorno
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Archivos de log y cache
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.orig
+*.rej
+.DS_Store
+
+# Configuración de editores
+.vscode/
+.idea/
+*.code-workspace
+
+# Archivos de prueba o compilación
+dist/
+build/
+*.egg-info/
+
+# Configuración del sistema operativo
+Thumbs.db
+desktop.ini
+
+# Docker y PostgreSQL locales (si usas volúmenes)
+postgres_data/
