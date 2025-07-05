@@ -88,6 +88,5 @@ def mostrar_formulario_factura(root):
             ventana.destroy()
         else:
             messagebox.showerror("Error", respuesta)
-
-    tk.Button(ventana, text="Calcular Total", command=calcular_total).pack()
+            
     tk.Button(ventana, text="Guardar Factura", command=on_submit).pack(pady=10)

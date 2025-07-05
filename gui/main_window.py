@@ -18,6 +18,12 @@ def start_main_window():
     # Menú principal
     menubar = tk.Menu(root)
 
+    # Menú de Usuarios
+    usuarios_menu = tk.Menu(menubar, tearoff=0)
+    usuarios_menu.add_command(label="Agregar Usuario", command=lambda: mostrar_formulario_usuario(root))
+    usuarios_menu.add_command(label="Listar Usuarios", command=lambda: mostrar_listado_usuarios(root))
+    menubar.add_cascade(label="Usuarios", menu=usuarios_menu)
+
     # Menú de Clientes
     clientes_menu = tk.Menu(menubar, tearoff=0)
     clientes_menu.add_command(label="Agregar Cliente", command=lambda: mostrar_formulario_cliente(root))
@@ -35,12 +41,6 @@ def start_main_window():
     productos_menu.add_command(label="Agregar Producto", command=lambda: mostrar_formulario_producto(root))
     productos_menu.add_command(label="Listar Productos", command=lambda: mostrar_listado_productos(root))
     menubar.add_cascade(label="Productos", menu=productos_menu)
-
-    # Menú de Usuarios
-    usuarios_menu = tk.Menu(menubar, tearoff=0)
-    usuarios_menu.add_command(label="Agregar Usuario", command=lambda: mostrar_formulario_usuario(root))
-    usuarios_menu.add_command(label="Listar Usuarios", command=lambda: mostrar_listado_usuarios(root))
-    menubar.add_cascade(label="Usuarios", menu=usuarios_menu)
 
     # Menú de Facturas
     ventas_menu = tk.Menu(menubar, tearoff=0)
