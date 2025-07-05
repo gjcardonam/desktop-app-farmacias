@@ -6,9 +6,12 @@
 
 ## 📦 Características
 
+- Autenticación con login y cierre de sesión
+- Gestión de usuarios con roles (`admin`, `vendedor`, etc.)
 - Registro y consulta de clientes y farmacias
 - Gestión de productos con stock e inventario
-- Interfaz gráfica intuitiva
+- Registro de facturas y control de ventas
+- Interfaz gráfica intuitiva y modular
 - Arquitectura por capas: GUI, controller, service, repository
 - Conexión a PostgreSQL vía `psycopg2`
 - Variables de entorno gestionadas con `.env`
@@ -70,18 +73,28 @@ La interfaz se abrirá con las opciones de gestión habilitadas.
 ```bash
 farmacontable/
 │
-├── db/                 # Conexión y queries SQL
-├── models/             # Clases de dominio (Cliente, Farmacia, Producto...)
-├── services/           # Lógica de negocio
-├── controllers/        # Enlace entre GUI y lógica
-├── gui/                # Formularios Tkinter
-├── main.py             # Punto de entrada
-├── .env                # Variables de entorno (NO subir al repo)
+├── db/                     # Repositorios y acceso a base de datos
+│   └── connection.py       # Manejo de conexión
+├── models/                 # Clases de dominio (Cliente, Usuario, etc.)
+├── services/               # Lógica de negocio (login, CRUD, validaciones)
+├── controllers/            # (opcional) Vínculo entre GUI y lógica (si aplica)
+├── gui/                    # Formularios Tkinter (login, clientes, productos, etc.)
+│
+├── global_state.py         # Manejo de sesión activa
+├── main.py                 # Punto de entrada (muestra login y lanza UI)
+├── requirements.txt
+├── .env                    # Variables de entorno (NO subir al repo)
 ├── .gitignore
 └── README.md
 ```
 
 ⸻
+
+## 🔐 Autenticación y Sesión
+
+- Se requiere iniciar sesión para acceder al sistema.
+- El rol del usuario se guarda en memoria y puede condicionar el acceso a ciertas funcionalidades.
+- El sistema usa un archivo global_state.py para gestionar la sesión actual.
 
 ## 📌 Licencia
 

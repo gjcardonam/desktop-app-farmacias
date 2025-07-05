@@ -1,7 +1,7 @@
 from db.connection import get_connection
 from datetime import datetime
 
-def insertar_factura_venta(id_cliente, productos):
+def insertar_factura_venta(id_cliente, productos, id_usuario):
     conn = get_connection()
     cur = conn.cursor()
 
@@ -15,8 +15,8 @@ def insertar_factura_venta(id_cliente, productos):
 
     cur.execute("""
         INSERT INTO FacturaVenta (fecha, id_cliente, id_usuario, total, estado)
-        VALUES (%s, %s, %s, %s, %s) RETURNING id_factura
-    """, (datetime.now(), id_cliente, 1, total, "Pagada"))
+        VALUES (%s, %s, %s, %s, %s) RETURNING id_factura    
+    """, (datetime.now(), id_cliente, id_usuario, total, "Pagada"))
     factura_id = cur.fetchone()[0]
 
     for p in productos:
