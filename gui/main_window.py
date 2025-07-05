@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 from gui.cliente_form import mostrar_formulario_cliente
 from gui.farmacia_form import mostrar_formulario_farmacia
 from gui.listado_clientes import mostrar_listado_clientes
