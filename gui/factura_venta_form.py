@@ -75,7 +75,8 @@ def mostrar_formulario_factura(root):
             if cantidad > 0:
                 productos_factura.append({
                     "producto_id": int(id_producto),
-                    "cantidad": cantidad
+                    "cantidad": cantidad,
+                    "precio": float(precio)
                 })
 
         if not productos_factura:
