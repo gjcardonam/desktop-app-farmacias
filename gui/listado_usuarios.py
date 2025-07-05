@@ -2,11 +2,13 @@ import tkinter as tk
 from tkinter import ttk
 from services.usuario_service import obtener_todos_los_usuarios
 from gui.editar_usuario_form import mostrar_formulario_edicion_usuario
+from utils.ui_utils import centrar_ventana
 
 def mostrar_listado_usuarios(root):
     ventana = tk.Toplevel(root)
     ventana.title("Listado de Usuarios")
     ventana.geometry("600x400")
+    centrar_ventana(ventana, 600, 400)
 
     columnas = ("id", "nombre", "email")
     tree = ttk.Treeview(ventana, columns=columnas, show="headings")

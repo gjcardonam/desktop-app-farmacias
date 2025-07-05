@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from services.factura_service import obtener_facturas
 from services.factura_service import obtener_detalle_factura
+from utils.ui_utils import centrar_ventana
 
 def mostrar_detalle_factura(factura_id, root):
     detalles = obtener_detalle_factura(factura_id)
@@ -11,6 +12,7 @@ def mostrar_detalle_factura(factura_id, root):
     ventana = tk.Toplevel(root)
     ventana.title(f"Detalle de Factura #{factura_id}")
     ventana.geometry("600x450")
+    centrar_ventana(ventana, 600, 450)
 
     tree = ttk.Treeview(ventana, columns=("producto", "cantidad", "precio_unit", "impuesto", "subtotal"), show="headings")
     tree.heading("producto", text="Producto")

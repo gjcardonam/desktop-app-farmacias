@@ -1,13 +1,12 @@
-from db.connection import get_connection
-from db.connection import get_connection
+from db.connection import DBConnection
 
 def obtener_farmacia(farmacia_id):
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
     cur.execute("SELECT id_farmacia, nombre, nit, direccion, telefono FROM Farmacia WHERE id_farmacia = %s", (farmacia_id,))
     row = cur.fetchone()
     cur.close()
-    conn.close()
+    
     if row:
         return {
             "id": row[0],
@@ -19,7 +18,7 @@ def obtener_farmacia(farmacia_id):
     return None
 
 def actualizar_farmacia_db(farmacia_id, farmacia):
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
     cur.execute("""
         UPDATE Farmacia
@@ -28,19 +27,19 @@ def actualizar_farmacia_db(farmacia_id, farmacia):
     """, (farmacia.nombre, farmacia.nit, farmacia.direccion, farmacia.telefono, farmacia_id))
     conn.commit()
     cur.close()
-    conn.close()
+    
 
 def obtener_farmacias():
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
     cur.execute("SELECT id_farmacia, nombre, nit, direccion, telefono FROM Farmacia")
     rows = cur.fetchall()
     cur.close()
-    conn.close()
+    
     return [{"id": r[0], "nombre": r[1], "nit": r[2], "direccion": r[3], "telefono": r[4]} for r in rows]
 
 def insertar_farmacia(farmacia):
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO Farmacia (nombre, nit, direccion, telefono)
@@ -48,4 +47,4 @@ def insertar_farmacia(farmacia):
     """, (farmacia.nombre, farmacia.nit, farmacia.direccion, farmacia.telefono))
     conn.commit()
     cur.close()
-    conn.close()
+    

@@ -2,11 +2,13 @@ import tkinter as tk
 from tkinter import ttk
 from services.producto_service import obtener_todos_los_productos
 from gui.editar_producto_form import mostrar_formulario_edicion_producto
+from utils.ui_utils import centrar_ventana
 
 def mostrar_listado_productos(root):
     ventana = tk.Toplevel(root)
     ventana.title("Listado de Productos")
     ventana.geometry("700x400")
+    centrar_ventana(ventana, 700, 400)
 
     columnas = ("id", "nombre", "precio_venta", "stock", "farmacia")
     tree = ttk.Treeview(ventana, columns=columnas, show="headings")

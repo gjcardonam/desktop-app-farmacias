@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from services.usuario_service import obtener_usuario, procesar_actualizacion_usuario
+from utils.ui_utils import centrar_ventana
 
 def mostrar_formulario_edicion_usuario(root, usuario_id, on_update_callback=None):
     usuario = obtener_usuario(usuario_id)
@@ -11,6 +12,7 @@ def mostrar_formulario_edicion_usuario(root, usuario_id, on_update_callback=None
     ventana = tk.Toplevel(root)
     ventana.title("Editar Usuario")
     ventana.geometry("400x400")
+    centrar_ventana(ventana, 400, 400)
 
     # Nombre
     tk.Label(ventana, text="Nombre:").pack(pady=5)

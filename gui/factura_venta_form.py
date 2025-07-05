@@ -3,11 +3,13 @@ from tkinter import ttk, messagebox, simpledialog
 from services.factura_service import registrar_factura
 from services.cliente_service import obtener_todos_los_clientes
 from services.producto_service import obtener_todos_los_productos
+from utils.ui_utils import centrar_ventana
 
 def mostrar_formulario_factura(root):
     ventana = tk.Toplevel(root)
     ventana.title("Registrar Factura de Venta")
     ventana.geometry("700x600")
+    centrar_ventana(ventana, 700, 600)
 
     # --- Cliente ---
     tk.Label(ventana, text="Cliente:").pack(pady=5)

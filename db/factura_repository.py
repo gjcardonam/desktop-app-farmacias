@@ -1,8 +1,8 @@
-from db.connection import get_connection
+from db.connection import DBConnection
 from datetime import datetime
 
 def obtener_detalle_factura(factura_id):
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
 
     cur.execute("""
@@ -22,11 +22,10 @@ def obtener_detalle_factura(factura_id):
         })
 
     cur.close()
-    conn.close()
     return detalles
 
 def obtener_todas_las_facturas():
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
 
     cur.execute("""
@@ -45,7 +44,6 @@ def obtener_todas_las_facturas():
 
     rows = cur.fetchall()
     cur.close()
-    conn.close()
 
     return [
         {
@@ -59,7 +57,7 @@ def obtener_todas_las_facturas():
     ]
 
 def insertar_factura_venta(id_cliente, productos, id_usuario):
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
 
     total = 0
@@ -89,5 +87,4 @@ def insertar_factura_venta(id_cliente, productos, id_usuario):
 
     conn.commit()
     cur.close()
-    conn.close()
     return factura_id, total

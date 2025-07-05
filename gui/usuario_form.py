@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
 from services.usuario_service import procesar_nuevo_usuario
+from utils.ui_utils import centrar_ventana
 
 def mostrar_formulario_usuario(root):
     ventana = tk.Toplevel(root)
     ventana.title("Agregar Usuario")
     ventana.geometry("400x350")
+    centrar_ventana(ventana, 400, 350)
 
     # Nombre
     tk.Label(ventana, text="Nombre:").pack(pady=5)

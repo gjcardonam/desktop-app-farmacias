@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from services.cliente_service import obtener_cliente_por_id, actualizar_cliente
+from utils.ui_utils import centrar_ventana
 
 def mostrar_formulario_edicion_cliente(root, cliente_id, on_update_callback=None):
     cliente = obtener_cliente_por_id(cliente_id)
@@ -11,6 +12,7 @@ def mostrar_formulario_edicion_cliente(root, cliente_id, on_update_callback=None
     ventana = tk.Toplevel(root)
     ventana.title("Editar Cliente")
     ventana.geometry("400x300")
+    centrar_ventana(ventana, 400, 300)
 
     tk.Label(ventana, text="Nombre:").pack(pady=5)
     entry_nombre = tk.Entry(ventana, width=40)

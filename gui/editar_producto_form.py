@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from services.producto_service import obtener_producto_por_id, actualizar_producto
 from services.farmacia_service import obtener_farmacias
+from utils.ui_utils import centrar_ventana
 
 def mostrar_formulario_edicion_producto(root, producto_id, on_update_callback=None):
     producto = obtener_producto_por_id(producto_id)
@@ -12,6 +13,7 @@ def mostrar_formulario_edicion_producto(root, producto_id, on_update_callback=No
     ventana = tk.Toplevel(root)
     ventana.title("Editar Producto")
     ventana.geometry("500x450")
+    centrar_ventana(ventana, 500, 450)
 
     tk.Label(ventana, text="Nombre:").pack(pady=5)
     entry_nombre = tk.Entry(ventana, width=50)

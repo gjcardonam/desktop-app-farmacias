@@ -2,11 +2,13 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from services.producto_service import procesar_nuevo_producto
 from services.farmacia_service import obtener_farmacias
+from utils.ui_utils import centrar_ventana
 
 def mostrar_formulario_producto(root):
     ventana = tk.Toplevel(root)
     ventana.title("Agregar Producto")
     ventana.geometry("500x450")
+    centrar_ventana(ventana, 500, 450)
 
     tk.Label(ventana, text="Nombre:").pack(pady=5)
     entry_nombre = tk.Entry(ventana, width=50)

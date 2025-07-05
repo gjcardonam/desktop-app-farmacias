@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
 from controllers.farmacia_controller import guardar_farmacia
+from utils.ui_utils import centrar_ventana
 
 def mostrar_formulario_farmacia(root):
     ventana = tk.Toplevel(root)
     ventana.title("Agregar Farmacia")
     ventana.geometry("400x300")
+    centrar_ventana(ventana, 400, 300)
 
     tk.Label(ventana, text="Nombre:").pack(pady=5)
     entry_nombre = tk.Entry(ventana, width=40)

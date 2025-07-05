@@ -1,7 +1,27 @@
-from db.connection import get_connection
+from db.connection import DBConnection
+
+def buscar_usuario_por_credenciales(email, password):
+    conn = DBConnection.get_instance().get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id_usuario, nombre, email, rol
+        FROM Usuario
+        WHERE email = %s AND contraseña = %s AND activo = TRUE
+    """, (email, password))
+    row = cur.fetchone()
+    cur.close()
+
+    if row:
+        return {
+            "id": row[0],
+            "nombre": row[1],
+            "email": row[2],
+            "rol": row[3]
+        }
+    return None
 
 def insertar_usuario(usuario):
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO Usuario (nombre, email, rol, contraseña, activo)
@@ -15,15 +35,15 @@ def insertar_usuario(usuario):
     ))
     conn.commit()
     cur.close()
-    conn.close()
+    
 
 def obtener_usuarios():
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
     cur.execute("SELECT id_usuario, nombre, email, rol, activo FROM Usuario")
     rows = cur.fetchall()
     cur.close()
-    conn.close()
+    
     return [
         {
             "id": r[0],
@@ -36,7 +56,7 @@ def obtener_usuarios():
     ]
 
 def obtener_usuario_por_id(id_usuario):
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
     cur.execute("""
         SELECT id_usuario, nombre, email, rol, activo
@@ -45,7 +65,7 @@ def obtener_usuario_por_id(id_usuario):
     """, (id_usuario,))
     row = cur.fetchone()
     cur.close()
-    conn.close()
+    
     if row:
         return {
             "id": row[0],
@@ -57,7 +77,7 @@ def obtener_usuario_por_id(id_usuario):
     return None
 
 def actualizar_usuario_db(id_usuario, nombre, email, rol, activo, nueva_contraseña=None):
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
 
     if nueva_contraseña:
@@ -82,4 +102,4 @@ def actualizar_usuario_db(id_usuario, nombre, email, rol, activo, nueva_contrase
 
     conn.commit()
     cur.close()
-    conn.close()
+    

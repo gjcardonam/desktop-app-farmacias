@@ -1,7 +1,7 @@
-from db.connection import get_connection
+from db.connection import DBConnection
 
 def obtener_producto(producto_id):
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
     cur.execute("""
         SELECT p.id_producto, p.nombre, p.descripcion, p.precio_venta, p.costo, p.stock, f.id_farmacia, f.nombre
@@ -11,7 +11,7 @@ def obtener_producto(producto_id):
     """, (producto_id,))
     row = cur.fetchone()
     cur.close()
-    conn.close()
+    
     if row:
         return {
             "id": row[0],
@@ -26,7 +26,7 @@ def obtener_producto(producto_id):
     return None
 
 def actualizar_producto_db(producto_id, producto):
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
     cur.execute("""
         UPDATE Producto
@@ -48,10 +48,10 @@ def actualizar_producto_db(producto_id, producto):
     ))
     conn.commit()
     cur.close()
-    conn.close()
+    
     
 def obtener_productos():
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
     cur.execute("""
         SELECT p.id_producto, p.nombre, p.precio_venta, p.stock, f.nombre
@@ -60,7 +60,7 @@ def obtener_productos():
     """)
     rows = cur.fetchall()
     cur.close()
-    conn.close()
+    
     return [{
         "id": r[0],
         "nombre": r[1],
@@ -70,7 +70,7 @@ def obtener_productos():
     } for r in rows]
 
 def insertar_producto(producto):
-    conn = get_connection()
+    conn = DBConnection.get_instance().get_connection()
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO Producto (nombre, descripcion, precio_venta, costo, stock, id_farmacia)
@@ -85,4 +85,4 @@ def insertar_producto(producto):
     ))
     conn.commit()
     cur.close()
-    conn.close()
+    

@@ -10,11 +10,13 @@ from gui.factura_venta_form import mostrar_formulario_factura
 from gui.usuario_form import mostrar_formulario_usuario
 from gui.listado_usuarios import mostrar_listado_usuarios
 from gui.listado_facturas import mostrar_listado_facturas
+from utils.ui_utils import centrar_ventana
 
 def start_main_window():
     root = tk.Tk()
     root.title("Farmacontable")
     root.geometry("800x600")
+    centrar_ventana(root, 800, 600)
 
     # Menú principal
     menubar = tk.Menu(root)
