@@ -9,14 +9,7 @@ from gui.listado_productos import mostrar_listado_productos
 from gui.factura_venta_form import mostrar_formulario_factura
 from gui.usuario_form import mostrar_formulario_usuario
 from gui.listado_usuarios import mostrar_listado_usuarios
-from global_state import limpiar_usuario
-from gui.login_window import mostrar_login
 
-def cerrar_sesion(root):
-    if messagebox.askyesno("Cerrar Sesión", "¿Seguro que deseas cerrar sesión?"):
-        limpiar_usuario()
-        root.destroy()
-        mostrar_login()
 
 def start_main_window():
     root = tk.Tk()
@@ -25,11 +18,6 @@ def start_main_window():
 
     # Menú principal
     menubar = tk.Menu(root)
-
-    # Menú de Sesión
-    sesion_menu = tk.Menu(menubar, tearoff=0)
-    sesion_menu.add_command(label="Cerrar Sesión", command=lambda: cerrar_sesion(root))
-    menubar.add_cascade(label="Sesión", menu=sesion_menu)
 
     # Menú de Usuarios
     usuarios_menu = tk.Menu(menubar, tearoff=0)
