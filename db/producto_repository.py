@@ -1,5 +1,55 @@
 from db.connection import get_connection
 
+def obtener_producto(producto_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT p.id_producto, p.nombre, p.descripcion, p.precio_venta, p.costo, p.stock, f.id_farmacia, f.nombre
+        FROM Producto p
+        JOIN Farmacia f ON f.id_farmacia = p.id_farmacia
+        WHERE p.id_producto = %s
+    """, (producto_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    if row:
+        return {
+            "id": row[0],
+            "nombre": row[1],
+            "descripcion": row[2],
+            "precio_venta": row[3],
+            "costo": row[4],
+            "stock": row[5],
+            "id_farmacia": row[6],
+            "farmacia": row[7]
+        }
+    return None
+
+def actualizar_producto_db(producto_id, producto):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE Producto
+        SET nombre = %s,
+            descripcion = %s,
+            precio_venta = %s,
+            costo = %s,
+            stock = %s,
+            id_farmacia = %s
+        WHERE id_producto = %s
+    """, (
+        producto.nombre,
+        producto.descripcion,
+        producto.precio_venta,
+        producto.costo,
+        producto.stock,
+        producto.id_farmacia,
+        producto_id
+    ))
+    conn.commit()
+    cur.close()
+    conn.close()
+    
 def obtener_productos():
     conn = get_connection()
     cur = conn.cursor()
