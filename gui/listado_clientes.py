@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from services.cliente_service import obtener_todos_los_clientes
+from gui.editar_cliente_form import mostrar_formulario_edicion_cliente
 
 def mostrar_listado_clientes(root):
     ventana = tk.Toplevel(root)
@@ -14,8 +15,23 @@ def mostrar_listado_clientes(root):
         tree.heading(col, text=col.capitalize())
         tree.column(col, width=150)
 
-    clientes = obtener_todos_los_clientes()
-    for c in clientes:
-        tree.insert("", "end", values=(c["id"], c["nombre"], c["documento"], c["telefono"]))
+    def cargar_clientes():
+        # Limpiar
+        for item in tree.get_children():
+            tree.delete(item)
+        # Recargar
+        clientes = obtener_todos_los_clientes()
+        for c in clientes:
+            tree.insert("", "end", values=(c["id"], c["nombre"], c["documento"], c["telefono"]))
 
     tree.pack(expand=True, fill="both", padx=10, pady=10)
+
+    def on_double_click(event):
+        item = tree.selection()
+        if item:
+            valores = tree.item(item[0], "values")
+            cliente_id = int(valores[0])
+            mostrar_formulario_edicion_cliente(root, cliente_id, cargar_clientes)
+
+    tree.bind("<Double-1>", on_double_click)
+    cargar_clientes()
