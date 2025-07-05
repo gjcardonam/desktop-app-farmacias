@@ -1,4 +1,34 @@
 from db.connection import get_connection
+from db.connection import get_connection
+
+def obtener_farmacia(farmacia_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id_farmacia, nombre, nit, direccion, telefono FROM Farmacia WHERE id_farmacia = %s", (farmacia_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    if row:
+        return {
+            "id": row[0],
+            "nombre": row[1],
+            "nit": row[2],
+            "direccion": row[3],
+            "telefono": row[4]
+        }
+    return None
+
+def actualizar_farmacia_db(farmacia_id, farmacia):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE Farmacia
+        SET nombre = %s, nit = %s, direccion = %s, telefono = %s
+        WHERE id_farmacia = %s
+    """, (farmacia.nombre, farmacia.nit, farmacia.direccion, farmacia.telefono, farmacia_id))
+    conn.commit()
+    cur.close()
+    conn.close()
 
 def obtener_farmacias():
     conn = get_connection()
