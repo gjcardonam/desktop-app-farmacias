@@ -9,7 +9,7 @@ from gui.listado_productos import mostrar_listado_productos
 from gui.factura_venta_form import mostrar_formulario_factura
 from gui.usuario_form import mostrar_formulario_usuario
 from gui.listado_usuarios import mostrar_listado_usuarios
-
+from gui.listado_facturas import mostrar_listado_facturas
 
 def start_main_window():
     root = tk.Tk()
@@ -46,6 +46,7 @@ def start_main_window():
     # Menú de Facturas
     ventas_menu = tk.Menu(menubar, tearoff=0)
     ventas_menu.add_command(label="Registrar Factura", command=lambda: mostrar_formulario_factura(root))
+    ventas_menu.add_command(label="Listar Facturas", command=lambda: mostrar_listado_facturas(root))
     menubar.add_cascade(label="Ventas", menu=ventas_menu)
 
     root.config(menu=menubar)

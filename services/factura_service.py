@@ -1,5 +1,10 @@
 from db.factura_repository import insertar_factura_venta
 from global_state import get_usuario
+from db.factura_repository import obtener_todas_las_facturas
+from db.factura_repository import obtener_detalle_factura as repo_detalle_factura
+
+def obtener_detalle_factura(factura_id):
+    return repo_detalle_factura(factura_id)
     
 def registrar_factura(id_cliente, productos):
     try:
@@ -13,3 +18,7 @@ def registrar_factura(id_cliente, productos):
         return True, {"factura_id": factura_id, "total": total}
     except Exception as e:
         return False, str(e)
+        
+
+def obtener_facturas():
+    return obtener_todas_las_facturas()

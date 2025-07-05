@@ -6,7 +6,7 @@
 
 ## 📦 Características
 
-- Autenticación con login y cierre de sesión
+- Autenticación con login
 - Gestión de usuarios con roles (`admin`, `vendedor`, etc.)
 - Registro y consulta de clientes y farmacias
 - Gestión de productos con stock e inventario
