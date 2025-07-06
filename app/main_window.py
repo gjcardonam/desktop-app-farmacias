@@ -14,10 +14,12 @@ from app.usuarios.gui.usuario_form import mostrar_formulario_usuario
 from app.clientes.gui.cliente_form import mostrar_formulario_cliente
 from app.proveedores.gui.proveedor_form import mostrar_formulario_proveedor
 from app.proveedores.gui.listado_proveedores import mostrar_listado_proveedores
-from utils.ui_utils import centrar_ventana
+from utils.ui_utils import centrar_ventana, activar_enter_en_todos_los_botones, permitir_tab_en_botones
 
 def start_main_window():
     root = tk.Tk()
+    permitir_tab_en_botones(root)
+    activar_enter_en_todos_los_botones(root)
     root.title("Farmacontable")
     root.geometry("800x600")
     centrar_ventana(root, 800, 600)
