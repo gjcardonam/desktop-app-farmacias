@@ -1,8 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
+
 from app.clientes.services.cliente_service import obtener_todos_los_clientes
 from app.clientes.gui.editar_cliente_form import mostrar_formulario_edicion_cliente
+from utils.treeview_helpers import bind_treeview_activate
 from utils.ui_utils import centrar_ventana
+
 
 def mostrar_listado_clientes(root):
     ventana = tk.Toplevel(root)
@@ -17,23 +20,25 @@ def mostrar_listado_clientes(root):
         tree.heading(col, text=col.capitalize())
         tree.column(col, width=150)
 
-    def cargar_clientes():
-        # Limpiar
-        for item in tree.get_children():
-            tree.delete(item)
-        # Recargar
-        clientes = obtener_todos_los_clientes()
-        for c in clientes:
-            tree.insert("", "end", values=(c["id"], c["nombre"], c["documento"], c["telefono"]))
-
     tree.pack(expand=True, fill="both", padx=10, pady=10)
 
-    def on_double_click(event):
-        item = tree.selection()
-        if item:
-            valores = tree.item(item[0], "values")
-            cliente_id = int(valores[0])
-            mostrar_formulario_edicion_cliente(root, cliente_id, cargar_clientes)
+    def cargar_clientes():
+        # Limpiar contenido actual
+        for item in tree.get_children():
+            tree.delete(item)
+        # Poblar con datos frescos
+        for c in obtener_todos_los_clientes():
+            tree.insert(
+                "", "end",
+                values=(c["id"], c["nombre"], c["documento"], c["telefono"])
+            )
 
-    tree.bind("<Double-1>", on_double_click)
+    # Conecta Treeview al callback global: clic o Enter
+    bind_treeview_activate(
+        tree,
+        lambda cliente_id: mostrar_formulario_edicion_cliente(
+            root, cliente_id, cargar_clientes
+        )
+    )
+
     cargar_clientes()

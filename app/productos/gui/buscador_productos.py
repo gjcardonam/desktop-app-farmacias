@@ -39,14 +39,14 @@ def mostrar_buscador_productos(root):
                     prod["stock"]
                 ))
 
-    def on_double_click(event):
+    def on_activate(event):
         item = tree.selection()
         if item:
             valores = tree.item(item[0], "values")
             producto_id = int(valores[0])
             mostrar_formulario_edicion_producto(root, producto_id, cargar_productos_filtrados)
 
-    tree.bind("<Double-1>", on_double_click)
+    tree.bind("<<TreeviewActivate>>", on_activate)
 
     tk.Button(ventana, text="Buscar", command=cargar_productos_filtrados).pack(pady=5)
     tree.pack(expand=True, fill="both", padx=10, pady=10)

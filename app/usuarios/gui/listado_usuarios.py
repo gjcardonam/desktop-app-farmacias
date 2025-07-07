@@ -1,10 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
+
 from app.usuarios.services.usuario_service import obtener_todos_los_usuarios
 from app.usuarios.gui.editar_usuario_form import mostrar_formulario_edicion_usuario
+from utils.treeview_helpers import bind_treeview_activate
 from utils.ui_utils import centrar_ventana
 
-def mostrar_listado_usuarios(root):
+
+def mostrar_listado_usuarios(root: tk.Tk) -> None:
     ventana = tk.Toplevel(root)
     ventana.title("Listado de Usuarios")
     ventana.geometry("600x400")
@@ -17,21 +20,20 @@ def mostrar_listado_usuarios(root):
         tree.heading(col, text=col.capitalize())
         tree.column(col, width=150)
 
-    def cargar_usuarios():
-        for i in tree.get_children():
-            tree.delete(i)
-        usuarios = obtener_todos_los_usuarios()
-        for u in usuarios:
-            tree.insert("", "end", values=(u["id"], u["nombre"], u["email"]))
-
-    cargar_usuarios()
     tree.pack(expand=True, fill="both", padx=10, pady=10)
 
-    def on_double_click(event):
-        item = tree.selection()
-        if item:
-            valores = tree.item(item[0], "values")
-            usuario_id = int(valores[0])
-            mostrar_formulario_edicion_usuario(root, usuario_id, cargar_usuarios)
+    # ── carga / recarga ────────────────────────────────────────────────
+    def cargar_usuarios() -> None:
+        tree.delete(*tree.get_children())          # limpia el Treeview
+        for u in obtener_todos_los_usuarios():
+            tree.insert("", "end", values=(u["id"], u["nombre"], u["email"]))
 
-    tree.bind("<Double-1>", on_double_click)
+    # ── vínculo Enter + clic simple (o doble, según tu config global) ──
+    bind_treeview_activate(
+        tree,
+        lambda user_id: mostrar_formulario_edicion_usuario(
+            root, user_id, cargar_usuarios
+        )
+    )
+
+    cargar_usuarios()

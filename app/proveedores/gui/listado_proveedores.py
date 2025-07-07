@@ -1,10 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
-from app.proveedores.services.proveedor_service import obtener_todos_los_proveedores
-from utils.ui_utils import centrar_ventana
-from app.proveedores.gui.editar_proveedor_form import mostrar_formulario_edicion_proveedor
 
-def mostrar_listado_proveedores(root):
+from app.proveedores.services.proveedor_service import obtener_todos_los_proveedores
+from app.proveedores.gui.editar_proveedor_form import mostrar_formulario_edicion_proveedor
+from utils.treeview_helpers import bind_treeview_activate
+from utils.ui_utils import centrar_ventana
+
+
+def mostrar_listado_proveedores(root: tk.Tk) -> None:
     ventana = tk.Toplevel(root)
     ventana.title("Listado de Proveedores")
     ventana.geometry("700x400")
@@ -17,22 +20,29 @@ def mostrar_listado_proveedores(root):
         tree.heading(col, text=col.capitalize())
         tree.column(col, width=120)
 
-    def cargar():
-        for item in tree.get_children():
-            tree.delete(item)
-        for prov in obtener_todos_los_proveedores():
-            tree.insert("", "end", values=(
-                prov["id"], prov["nombre"], prov["documento"], prov["telefono"], prov["email"]
-            ))
-
     tree.pack(expand=True, fill="both", padx=10, pady=10)
+
+    # ── carga / recarga ──────────────────────────────────────────────────
+    def cargar() -> None:
+        tree.delete(*tree.get_children())          # limpia el Treeview
+        for p in obtener_todos_los_proveedores():
+            tree.insert(
+                "", "end",
+                values=(
+                    p["id"],
+                    p["nombre"],
+                    p["documento"],
+                    p["telefono"],
+                    p["email"],
+                ),
+            )
+
+    # ── vínculo Enter + clic simple (o doble, según config global) ──────
+    bind_treeview_activate(
+        tree,
+        lambda prov_id: mostrar_formulario_edicion_proveedor(
+            root, prov_id, cargar
+        )
+    )
+
     cargar()
-
-    def on_double_click(event):
-        item = tree.selection()
-        if item:
-            valores = tree.item(item[0], "values")
-            proveedor_id = int(valores[0])
-            mostrar_formulario_edicion_proveedor(root, proveedor_id, cargar)
-
-    tree.bind("<Double-1>", on_double_click)

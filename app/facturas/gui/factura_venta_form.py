@@ -61,7 +61,7 @@ def mostrar_formulario_factura(root):
             tree.item(item, values=values)
             calcular_total()
 
-    tree.bind("<Double-1>", on_edit_quantity)
+    tree.bind("<<TreeviewActivate>>", on_edit_quantity)
 
     def on_submit():
         if not combo_cliente.get():
