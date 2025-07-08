@@ -78,7 +78,7 @@ def mostrar_listado_facturas(root: tk.Tk) -> None:
 
     # carga / recarga
     def cargar_facturas():
-        tree.delete(*tree.get_children())           # limpia
+        tree.delete(*tree.get_children())
         for f in obtener_facturas():
             tree.insert(
                 "",

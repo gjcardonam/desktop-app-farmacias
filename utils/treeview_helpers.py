@@ -1,21 +1,27 @@
 import tkinter as tk
+import tkinter.ttk as ttk 
 from typing import Callable, Any
 
 def get_row_id(event: tk.Event, id_col: int = 0) -> int | None:
-    """
-    Devuelve el valor (int) de la columna `id_col` de la fila bajo el cursor.
-    Si el clic fue en una zona vacía → des-selecciona y retorna None.
-    """
-    tree = event.widget
+    tree: ttk.Treeview = event.widget
+
+    # 1. Intenta por coordenada (ratón)
     row = tree.identify_row(event.y)
 
-    if not row:                       # zona vacía
-        tree.selection_remove(tree.selection())
-        return None
+    # 2. Si falla (Enter o clic muy rápido), usa la selección
+    if not row:
+        sel = tree.selection()
+        if sel:
+            row = sel[0]
 
-    tree.selection_set(row)           # marca la fila clicada
+    if not row:
+        return None  # no hay fila válida
+
     values = tree.item(row, "values")
-    return int(values[id_col])
+    try:
+        return int(values[id_col])
+    except (IndexError, ValueError):
+        return None
 
 def bind_treeview_activate(
     tree: tk.ttk.Treeview,
