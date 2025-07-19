@@ -1,0 +1,376 @@
+🧾 1. Cotización / Solicitud de Cotización
+✅ OBJETIVO DEL MODELO
+Reflejar este ciclo:
+1.	Un usuario de la farmacia crea una solicitud de cotización (SC).
+2.	Se envía la SC a uno o más proveedores.
+3.	Cada proveedor puede responder con una cotización diferente:
+o	con equivalencias (producto alternativo),
+o	con cantidades mínimas,
+o	o no responder.
+4.	La farmacia analiza, aprueba o descarta propuestas.
+🧩 FLUJO COMPLETO POSIBLE CON ESTAS TABLAS
+Etapa	Tablas involucradas
+Creación de solicitud	SolicitudCotizacion, SolicitudCotizacionDetalle
+Envío a proveedores	SolicitudCotizacionProveedor
+Respuesta de proveedor	CotizacionProveedor, CotizacionProveedorDetalle
+Revisión y decisión interna	HistorialCotizacion, RechazoCotizacion (opcional)
+Aprobación para OC	(Se relaciona más adelante con OrdenCompra)
+ 
+✅ VENTAJAS DEL MODELO
+•	Soporta varios proveedores por solicitud.
+•	Soporta respuestas parciales o incompletas.
+•	Soporta producto alternativo o equivalente.
+•	Trazabilidad completa: desde la solicitud hasta la decisión.
+•	Permite reportes como:
+o	Proveedores que más cumplen con solicitudes.
+o	Historial de precios ofrecidos.
+o	Tiempo promedio de respuesta por proveedor.
+
+Servicios backend para 🧾 Cotización / Solicitud de Cotización
+Servicio (nombre en inglés)	Responsabilidad principal	Entidades que gestiona
+QuotationRequestService	• Crear, editar y cerrar una SolicitudCotizacion.
+• Cambiar su estado (Abierta → Cerrada / Cancelada / Expirada).	SolicitudCotizacion
+QuotationRequestItemService	• Añadir, actualizar o eliminar líneas de producto solicitadas.
+• Validar cantidades positivas y existencia del producto.	SolicitudCotizacionDetalle
+QuotationDispatchService	• Registrar a qué proveedor(es) se envía la solicitud.
+• Cambiar estado del envío (Enviada → Respondida / Expirada / Rechazada).
+• Disparar notificaciones externas (correo / API).	SolicitudCotizacionProveedor
+VendorQuotationService	• Crear la cabecera de la respuesta del proveedor.
+• Gestionar vigencia (validez_dias) y condiciones de pago.
+• Aceptar o rechazar la propuesta.	CotizacionProveedor
+VendorQuotationItemService	• Añadir líneas ofertadas con precio, unidad alternativa o equivalencia.
+• Validar que la oferta cumpla cantidades mínimas.	CotizacionProveedorDetalle
+QuotationHistoryService	• Registrar cambios relevantes (estados, ediciones, comentarios).
+• Consultar la bitácora completa por solicitud o cotización.	HistorialCotizacion
+QuotationRejectionService	• Motivar y registrar rechazos formales de cotizaciones.
+• Cambiar estado a Rechazada y notificar al proveedor.	RechazoCotizacion
+QuotationEvaluationService	• Consolidar todas las cotizaciones recibidas para una solicitud.
+• Calcular KPIs (costo total, tiempos, % de cumplimiento).
+• Seleccionar la oferta “ganadora” y preparar datos para la Orden de Compra.	Lectura de todas las tablas anteriores
+QuotationReportService	• Generar reportes de desempeño de proveedores y tiempos de respuesta.
+• Exportar a PDF/Excel o exponer endpoints para BI.	Vistas / consultas agregadas
+QuotationNotificationService	• Encapsular envíos de correo, alertas in app y webhooks a proveedores o usuarios internos en cada cambio de estado.	Integración externa, no tabla propia
+AttachmentService (opcional)	• Subir y servir archivos adjuntos a solicitudes o cotizaciones.	Tabla de adjuntos si se requiere
+Estos servicios cubren todo el ciclo:
+creación → envío → respuesta → análisis → cierre o rechazo, con trazabilidad completa y métricas listas para alimentar la generación de la Orden de Compra.
+
+
+
+
+
+
+
+
+
+📑 2. Orden de Compra
+
+🔍 ¿Qué incluye una Orden de Compra?
+Una Orden de Compra (OC) es el documento formal con el que la farmacia se compromete a comprar productos a un proveedor, bajo condiciones previamente pactadas o definidas en la OC. Puede originarse:
+•	A partir de una cotización aceptada (flujo ideal)
+•	De manera directa (flujo inmediato sin cotización previa)
+ 
+🧠 Consideraciones incluidas en este modelo:
+•	Casos exitosos (totalmente recibida y facturada)
+•	Casos fallidos (cancelación, anulación, rechazo de productos)
+•	Requerimientos reales:
+o	Flujo de aprobación
+o	Recepción parcial
+o	Varios ítems por OC
+o	Condiciones comerciales (entrega, pago, impuestos)
+o	Relación con cotizaciones
+o	Auditoría
+•	📘 FLUJOS CUBIERTOS
+Caso	¿Cubierto por?
+Orden directa (sin cotización)	origen = 'Directa'
+Orden desde cotización	FK a CotizacionProveedor
+Recepción parcial	RecepcionOrdenCompra
+Cancelación completa o parcial	CancelacionOrdenCompra
+Condiciones especiales	CondicionComercialOrdenCompra
+Trazabilidad y auditoría	HistorialOrdenCompra, AprobacionOrdenCompra
+Archivos asociados	DocumentoAdjuntoOrdenCompra
+
+
+Servicios backend para 📑 Orden de Compra (Purchase Order)
+Servicio (nombre en inglés)	Responsabilidad principal	Entidades que gestiona / consulta
+PurchaseOrderService	• Crear la cabecera de la OC, directa o a partir de la cotización ganadora.
+• Editar datos generales (fechas, proveedor, notas).
+• Cambiar estado → Pendiente / Cancelada / Cerrada.	OrdenCompra
+PurchaseOrderItemService	• Agregar, actualizar o eliminar líneas de producto.
+• Validar precios, IVA, cantidades y stock pendiente.
+• Calcular subtotal y totales.	OrdenCompraDetalle
+CommercialTermsService	• Registrar y editar condiciones especiales: forma de pago, lugar de entrega, descuentos globales, Incoterms.
+• Asociar texto legal o cláusulas.	CondicionComercialOrdenCompra
+PurchaseApprovalService	• Gestionar el flujo de aprobación (uno o varios aprobadores).
+• Cambiar estado a Aprobada.
+• Registrar quién, cuándo y comentarios.	AprobacionOrdenCompra, campos de OrdenCompra
+PurchaseOrderHistoryService	• Auditar cada cambio de estado o edición.
+• Exponer consulta cronológica completa.	HistorialOrdenCompra
+PurchaseOrderReceptionService	• Registrar recepciones parciales / totales de cada ítem contra la OC.
+• Actualizar cantidades pendientes.
+• Detonar alertas cuando la suma recibida = cantidad ordenada.	RecepcionOrdenCompra
+PurchaseOrderCancelService	• Anular o cancelar total parcialmente una OC.
+• Revertir compromisos de stock y notificar a proveedores.	CancelacionOrdenCompra, OrdenCompra
+PurchaseOrderAttachmentService	• Subir, versionar y servir archivos (PDF OC firmada, contratos, correos).	DocumentoAdjuntoOrdenCompra
+PurchaseOrderReportService	• KPIs de cumplimiento (plazos, diferencias, precios).
+• Exportar listados de OCs abiertas, parciales o vencidas.	Vistas sobre OrdenCompra y detalles
+PurchaseOrderNotificationService	• Enviar correos / alertas internas al aprobar, cancelar o recepcionar una OC.
+• Opcional webhook al proveedor.	Integración externa
+PurchaseOrderIntegrationService (opcional)	• Sincronizar OCs y recepciones con módulo contable / ERP externo.	API externa, no tabla propia
+Con estos servicios cubres todo el ciclo operativo y de control: creación, términos comerciales, aprobación, recepción parcial o total, cancelación, auditoría, reporting y comunicación con proveedores y usuarios internos.
+
+
+
+
+🚚 3. Remisión de Proveedor
+
+Muy bien, Gabriel. Vamos ahora con el modelado completo y robusto de la operación 🚚 3. Remisión de Proveedor, incluyendo:
+•	Casos exitosos (remisión recibida y aprobada)
+•	Casos con fallos (productos rechazados, remisión incompleta, remisión no autorizada)
+•	Trazabilidad por lote, vencimiento, y orden de compra
+•	Flujo normativo (INVIMA, DIAN - no fiscal pero trazable)
+ 
+🔍 ¿Qué es una remisión?
+La remisión del proveedor es el documento que acompaña físicamente el despacho de los productos. Suele llegar antes que la factura y puede:
+•	Ser parcial respecto a la orden de compra
+•	Incluir productos con errores, vencimientos, cambios de lote
+•	Ser rechazada total o parcialmente
+En sistemas bien implementados, la remisión no ingresa al inventario, pero activa el proceso de recepción, donde se valida lo recibido.
+📘 FLUJOS CUBIERTOS
+Flujo / Escenario	¿Qué tabla lo cubre?
+Remisión total o parcial	RemisionProveedor, RemisionDetalle
+Lote y vencimiento entregado	RemisionDetalle
+Producto no coincide con OC	DiscrepanciaRemision
+Producto rechazado	RechazoRemisionDetalle
+Auditoría de cambios	HistorialRemisionProveedor
+Archivos recibidos	DocumentoAdjuntoRemision
+Productos equivalentes entregados	RemisionProductoEquivalente
+
+
+
+Servicios backend para 🚚 Remisión de Proveedor (Supplier Shipment)
+Servicio (nombre en inglés)	Responsabilidad principal	Entidades que gestiona / consulta
+SupplierShipmentService	• Registrar la cabecera de la remisión que entrega el proveedor.
+• Cambiar estado (Pendiente → Recibida / Parcial / Rechazada / Anulada).
+• Vincularla a la Orden de Compra correspondiente.	RemisionProveedor
+SupplierShipmentItemService	• Añadir y editar líneas remitidas con cantidad, lote y vencimiento.
+• Validar que los ítems existan en la OC y que los lotes no estén vencidos.
+• Calcular totales remitidos.	RemisionDetalle
+ShipmentDiscrepancyService	• Registrar discrepancias (faltantes, sobrantes, producto inesperado, lote diferente, vencido).
+• Clasificar severidad y marcar si requiere acción correctiva.	DiscrepanciaRemision
+ShipmentRejectionService	• Registrar rechazos totales o parciales de los productos de la remisión.
+• Actualizar cantidades rechazadas y estado general (Rechazada).
+• Notificar al proveedor.	RechazoRemisionDetalle, RemisionProveedor
+ShipmentEquivalentItemService	• Manejar productos equivalentes entregados (códigos alternativos).
+• Guardar justificación y asociar original vs. entregado.	RemisionProductoEquivalente
+ShipmentHistoryService	• Auditar todas las acciones sobre la remisión (creación, edición, cambio de estado).
+• Exponer consulta detallada para trazabilidad INVIMA/DIAN.	HistorialRemisionProveedor
+ShipmentAttachmentService	• Gestionar subida y consulta de PDFs, guías de transporte, evidencias fotográficas.
+• Versionar y asegurar URLs.	DocumentoAdjuntoRemision
+ShipmentValidationService	• Validar reglas de negocio antes de pasar a recepción (ej.: lote obligatorio, fecha ≥ hoy, cantidades coherentes).
+• Bloquear flujo si hay discrepancias críticas.	Lectura de RemisionDetalle & discrepancias
+ShipmentNotificationService	• Enviar alertas a logística almacén, compras y proveedor al registrar, aceptar o rechazar remisión.
+• Recordatorios automáticos si la remisión queda “Pendiente” demasiado tiempo.	Integración externa
+ShipmentReportingService	• Métricas de cumplimiento: exactitud de envío, frecuencia de discrepancias, índice de rechazo.
+• Exportar reportes a BI / Excel.	Vistas sobre todas las tablas de remisión
+ShipmentIntegrationService (opcional)	• Publicar eventos a módulos de Recepción y Calidad.
+• Sincronizar con sistemas WMS o TMS externos si aplica.	Eventos / webhooks
+Con esta capa de servicios se cubre la gestión completa de la remisión: registro, validación contra la OC, manejo de discrepancias y rechazos, auditoría exhaustiva, anexos y reporting, antes de dar paso al módulo de Recepción de Mercancía.
+
+
+
+
+
+📥 4. Recepción de Mercancía
+
+🔍 ¿Qué es la recepción de mercancía?
+La recepción de mercancía es la operación mediante la cual la farmacia verifica físicamente lo que llegó (desde la remisión del proveedor) y decide qué se acepta o rechaza antes de ingresarlo al inventario.
+Es el punto de control de calidad y cumplimiento, con impacto directo en:
+•	Trazabilidad de lotes
+•	Seguridad sanitaria
+•	Inventario
+•	Pagos y facturación
+ 
+✅ FLUJOS Y ESCENARIOS CONSIDERADOS
+1.	Recepción total (todo lo remitido es aceptado)
+2.	Recepción parcial (faltan ítems o se rechazan productos)
+3.	Recepción rechazada (todo se rechaza por error, daño, vencimiento)
+4.	Múltiples recepciones para una misma remisión
+5.	Revisión por criterios de calidad: empaque, temperatura, fecha de vencimiento
+6.	Seguimiento de causas de rechazo
+7.	Aprobación formal para ingreso a inventario
+
+📘 FLUJOS CUBIERTOS
+Escenario	¿Qué tabla lo cubre?
+Recepción desde remisión	RecepcionCompra
+Lotes y vencimiento validados	RecepcionDetalle
+Rechazo parcial o total	RechazoRecepcionDetalle
+Control de calidad	ChecklistRecepcion
+Auditoría interna	HistorialRecepcionCompra
+Evidencias documentales	DocumentoAdjuntoRecepcion
+ 
+✅ VENTAJAS DE ESTE MODELO
+•	Permite validación manual y automatizada de entregas
+•	Registra problemas de calidad o incumplimiento
+•	Separa recepción de ingreso a inventario, como debe ser
+•	Trazabilidad completa desde orden hasta ingreso físico
+•	Permite trazabilidad normativa exigida por INVIMA (control de lotes, vencimiento, rechazo)
+
+Servicios backend para 📥 Recepción de Mercancía (Goods Receipt)
+Servicio (nombre en inglés)	Responsabilidad principal	Entidades que gestiona / consulta
+GoodsReceiptService	• Crear la cabecera de la recepción a partir de la remisión.
+• Cambiar estado (EnRevision → Parcial / Aprobada / Rechazada).
+• Verificar que la remisión exista y no esté anulada.	RecepcionCompra
+GoodsReceiptItemService	• Añadir y editar líneas recibidas: cantidad, lote, vencimiento.
+• Validar que la suma aceptada + rechazada ≤ cantidad remitida.
+• Calcular totales aceptados / rechazados.	RecepcionDetalle
+QualityChecklistService	• Registrar criterios de inspección (temperatura, empaque, lote legible, etc.).
+• Marcar cumplimiento y comentarios.	ChecklistRecepcion
+ReceiptRejectionService	• Detallar causas y cantidades cuando se rechaza un producto.
+• Actualizar stock pendiente de la remisión.
+• Cambiar estado_item y, si corresponde, estado global a Rechazada.	RechazoRecepcionDetalle, RecepcionDetalle, RecepcionCompra
+ReceiptApprovalService	• Aprobar formalmente la recepción aceptada.
+• Disparar evento al módulo de Ingreso a Inventario.
+• Registrar usuario y fecha de aprobación.	Campos de RecepcionCompra
+ReceiptHistoryService	• Auditar cada acción: creación, ediciones, checklist, rechazos, aprobación.
+• Consultar bitácora completa para INVIMA / auditorías internas.	HistorialRecepcionCompra
+ReceiptAttachmentService	• Subir y servir evidencias: fotos de empaque, guías firmadas, lecturas de temperatura.
+• Versionar y mantener metadatos.	DocumentoAdjuntoRecepcion
+ReceiptValidationService	• Reglas automáticas: fecha de vencimiento ≥ hoy, lotes obligatorios, control de productos restringidos.
+• Bloquear aprobación si no se cumple.	Lectura de RecepcionDetalle + checklist
+ReceiptNotificationService	• Avisar a compras y contabilidad cuando hay rechazos o recepción aprobada.
+• Notificar al proveedor si hubo rechazo.	Integración externa
+ReceiptReportingService	• KPIs: % de productos rechazados, causas frecuentes, tiempo de inspección.
+• Exportar dashboards / informes.	Vistas sobre todas las tablas de recepción
+ReceiptIntegrationService	• Publicar evento “receipt approved” al módulo de Inventario (crea IngresoInventario).
+• Opcional: sincronizar con WMS externo.	Eventos / colas
+Estos servicios permiten gestionar, validar y auditar todo el flujo de Recepción de Mercancía, asegurando trazabilidad de lotes, cumplimiento sanitario y sincronización posterior con el inventario y la contabilidad.
+
+
+
+
+
+
+🧾 5. Factura del Proveedor
+
+🔍 ¿Qué es la factura del proveedor?
+Es el documento fiscal legal emitido por el proveedor (obligatoriamente electrónico en Colombia desde 2020), que respalda jurídicamente la transacción. Puede incluir productos entregados:
+•	Parcial o totalmente
+•	Relacionados con una o varias remisiones y órdenes
+•	Con o sin retenciones aplicables
+ 
+✅ FLUJOS Y ESCENARIOS CUBIERTOS
+•	Factura aceptada y conciliada con remisión y recepción
+•	Factura rechazada por diferencias
+•	Factura parcialmente registrada (por diferencia en ítems)
+•	Factura anulada
+•	Factura con retenciones en la fuente e IVA
+•	Factura electrónica (adjunto XML obligatorio)
+•	Factura agrupando varias remisiones u órdenes
+
+📘 FLUJOS CUBIERTOS
+Escenario	¿Qué tabla lo cubre?
+Factura simple y directa	FacturaCompra, FacturaCompraDetalle
+Factura con múltiples remisiones	RelacionFacturaRemision
+Rechazo por diferencias o errores	RechazoFacturaCompra
+Auditoría	HistorialFacturaCompra
+Factura electrónica	DocumentoAdjuntoFacturaCompra
+Retenciones aplicables	RetencionFacturaCompra
+ 
+✅ BENEFICIOS DE ESTE MODELO
+•	Total trazabilidad con órdenes y remisiones
+•	Soporte normativo para facturación electrónica y contabilidad
+•	Posibilidad de conciliación automatizada
+•	Control de impuestos y obligaciones tributarias
+•	Permite reportes financieros confiables y auditables
+
+Servicios backend para 🧾 Factura del Proveedor (Supplier Invoice)
+Servicio (nombre en inglés)	Responsabilidad principal	Entidades que gestiona / consulta
+SupplierInvoiceService	• Registrar cabecera de factura (manual o auto importación XML).
+• Cambiar estado (Pendiente → Aprobada / Conciliada / Rechazada / Anulada).
+• Validar regla financiera (total = subtotal − descuentos + IVA).	FacturaCompra
+SupplierInvoiceItemService	• Añadir, editar o eliminar líneas facturadas.
+• Verificar cantidades, precios unitarios y % IVA.
+• Calcular totales por ítem.	FacturaCompraDetalle
+InvoiceRemittanceLinkService	• Relacionar factura con una o varias remisiones y órdenes.
+• Verificar coherencia de cantidades y lotes.
+• Mostrar diferencias para conciliación.	RelacionFacturaRemision
+InvoiceRetentionService	• Registrar y calcular retenciones: IVA, Renta, ICA, autoretección.
+• Ajustar valor neto a pagar.	RetencionFacturaCompra
+InvoiceReconciliationService	• Conciliar factura con recepciones aprobadas.
+• Detectar sobrantes, faltantes o precios distintos.
+• Marcar factura parcial o rechazar.	Lectura de factura, remisión y recepción
+InvoiceRejectionService	• Registrar motivo y usuario cuando la factura se rechaza.
+• Cambiar estado a Rechazada y notificar proveedor.	RechazoFacturaCompra, FacturaCompra
+InvoiceAttachmentService	• Guardar XML oficial, PDF representativo y otros soportes.
+• Mantener metadatos y versión.	DocumentoAdjuntoFacturaCompra
+InvoiceHistoryService	• Auditar cada cambio de estado o edición de la factura.
+• Exponer trazabilidad completa para DIAN y auditorías internas.	HistorialFacturaCompra
+InvoiceNotificationService	• Enviar alertas a contabilidad/compras ante: factura recibida, conciliada o rechazada.
+• Opcional notificar proveedor con resultado de validación.	Integración externa
+InvoiceReportingService	• KPIs financieros: facturas pendientes, rechazadas, tiempos de conciliación, retenciones generadas.
+• Exportar a BI, PDF o Excel.	Vistas sobre facturas y retenciones
+InvoiceIntegrationService	• Publicar asientos contables a módulo Financiero / ERP.
+• Sincronizar con tesorería para flujo de pagos.	API externa, eventos
+InvoiceValidationService (opcional)	• Validar estructura y firma del XML de factura electrónica.
+• Verificar CUFE y numeración DIAN.	Lectura de XML, no tabla propia
+Con estos servicios manejas todo el ciclo de la Factura del Proveedor: registro (manual o electrónico), verificación normativa, conciliación con remisiones y OCs, gestión de retenciones, auditoría exhaustiva y conexión con los módulos contable y de pagos.
+
+
+
+
+📦 6. Ingreso a Inventario
+
+🔍 ¿Qué implica el ingreso a inventario?
+El Ingreso a Inventario es la operación que registra oficialmente los productos aceptados en el sistema y que estarán disponibles para ventas o uso. Debe derivarse de una recepción aprobada, pero pueden haber otras fuentes como:
+•	Ajustes por sobrantes
+•	Donaciones
+•	Ingresos por devoluciones
+ 
+✅ FLUJOS Y CASOS CUBIERTOS
+1.	Ingreso por recepción validada (flujo ideal)
+2.	Ingreso parcial o por lote específico
+3.	Ingreso con error (rollback)
+4.	Ingreso por ajuste manual
+5.	Ingreso con costo distinto al esperado
+6.	Ingreso cancelado o anulado
+7.	Control de productos vencidos o controlados
+8.	Registro de trazabilidad contable (opcional, como puente a módulo contable)
+
+✅ BENEFICIOS DEL MODELO
+•	Estructura profesional, alineada con trazabilidad INVIMA y logística moderna
+•	Múltiples fuentes de ingreso (recepción, ajuste, etc.)
+•	Control por lote y vencimiento desde el ingreso
+•	Permite historial para auditorías, reversión y control contable
+•	Evita ingreso directo al inventario sin verificación previa
+
+
+Servicios backend para 📦 Ingreso a Inventario (Inventory Inbound)
+Servicio (nombre en inglés)	Responsabilidad principal	Entidades que gestiona / consulta
+InventoryInboundService	• Crear el cabecera de ingreso a partir de una recepción aprobada o de un ajuste/devolución.
+• Cambiar estado (Pendiente → Confirmado / Anulado).
+• Asignar correlativo y fuente (Recepcion, Ajuste, Devolucion, Manual).	IngresoInventario
+InventoryInboundItemService	• Añadir, editar o eliminar líneas ingresadas.
+• Validar lote, fecha de vencimiento y cantidad > 0.
+• Calcular costo promedio o FIFO según política.	IngresoInventarioDetalle
+StockMovementService	• Generar movimientos contables/lógicos de stock al confirmar ingreso.
+• Registrar tipo (Entrada, Ajuste, Anulacion).
+• Sincronizar con LoteProductoSucursal (crear lote o actualizar cantidad).	MovimientoInventario, LoteProductoSucursal
+InboundValidationService	• Reglas automáticas: fecha de vencimiento ≥ hoy, lote obligatorio, control de medicamentos controlados.
+• Bloquear confirmación si no se cumple.	Lectura de detalles y lotes
+InboundCancellationService	• Anular un ingreso confirmado (rollback).
+• Registrar motivo, usuario y fecha.
+• Revertir movimientos de stock.	AnulacionIngresoInventario, IngresoInventario, MovimientoInventario
+InboundHistoryService	• Auditar cada acción (creación, confirmación, anulación).
+• Consultar bitácora completa para INVIMA y revisiones contables.	HistorialIngresoInventario
+InboundAttachmentService	• Subir y servir certificados de calidad, actas de donación, fotos de lotes.
+• Versionar y mantener metadatos.	DocumentoAdjuntoIngresoInventario
+InboundNotificationService	• Notificar a compras, contabilidad y planeación de stock cuando se confirma o anula un ingreso.
+• Alertar si se detectan productos vencidos o controlados.	Integración externa
+InboundReportingService	• KPIs: tiempo entre recepción y disponibilidad, valor de inventario ingresado, ajustes realizados.
+• Exportar informes a BI / Excel.	Vistas sobre IngresoInventario, stock y movimientos
+InboundIntegrationService	• Publicar eventos a módulos de Contabilidad (costos) y Ventas (disponibilidad).
+• Sincronizar con WMS o ERP externo si aplica.	Eventos / colas, API externa
+InboundAdjustmentService (opcional)	• Crear ingresos tipo “Ajuste” para sobrantes o correcciones.
+• Validar autorización y registrar usuario responsable.	IngresoInventario, MovimientoInventario
+Estos servicios cubren todo el ciclo del Ingreso a Inventario: creación desde recepciones o ajustes, validación normativa y de calidad, confirmación con impacto en stock, anulación con rollback, auditoría y reporting, garantizando trazabilidad completa y conexión con contabilidad y logística.
+
