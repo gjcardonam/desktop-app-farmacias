@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
-from app.cotizaciones.services.solicitud_cotizacion_service import crear_solicitud_cotizacion, enviar_solicitud_a_proveedores
+from app.cotizaciones.services.solicitud_cotizacion_service import crear_solicitud_cotizacion
+from app.cotizaciones.gui.seleccionar_proveedores import seleccionar_proveedores
 from utils.ui_utils import centrar_ventana
 
 def mostrar_formulario_solicitud(root):
@@ -33,15 +34,19 @@ def mostrar_formulario_solicitud(root):
                 prod, cant = item.split(",")
                 items.append({"id_producto": int(prod), "cantidad": int(cant)})
 
-            exito, mensaje = crear_solicitud_cotizacion(
+            # crear_solicitud_cotizacion debe devolver (exito, mensaje, solicitud_id)
+            exito, mensaje, solicitud_id = crear_solicitud_cotizacion(
                 int(entry_sucursal.get()),
                 int(entry_usuario.get()),
                 items,
                 entry_obs.get()
             )
+
             if exito:
                 messagebox.showinfo("Éxito", mensaje)
                 ventana.destroy()
+                # Llamar a la ventana para seleccionar proveedores
+                seleccionar_proveedores(root, solicitud_id)
             else:
                 messagebox.showerror("Error", mensaje)
         except Exception as e:
