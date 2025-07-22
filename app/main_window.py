@@ -20,6 +20,8 @@ from app.proveedores.gui.proveedor_form import mostrar_formulario_proveedor
 from app.proveedores.gui.listado_proveedores import mostrar_listado_proveedores
 from app.proveedores.gui.buscador_proveedores import mostrar_buscador_proveedores
 from utils.ui_utils import centrar_ventana, activar_enter_en_todos_los_botones, permitir_tab_en_botones, activar_enter_en_treeviews
+from app.cotizaciones.gui.solicitud_cotizacion_form import mostrar_formulario_solicitud
+from app.cotizaciones.gui.listado_solicitudes import mostrar_listado_solicitudes
 
 def start_main_window():
     root = tk.Tk()
@@ -75,6 +77,13 @@ def start_main_window():
     menu_proveedores.add_command(label="Buscar Proveedor", command=lambda: mostrar_buscador_proveedores(root))
     menubar.add_cascade(label="Proveedores", menu=menu_proveedores)
 
+    # Menú de Solicitudes de Cotización
+    # Menú de Cotizaciones
+    cotizaciones_menu = tk.Menu(menubar, tearoff=0)
+    cotizaciones_menu.add_command(label="Nueva Solicitud", command=lambda: mostrar_formulario_solicitud(root))
+    cotizaciones_menu.add_command(label="Listar Solicitudes", command=lambda: mostrar_listado_solicitudes(root))
+    menubar.add_cascade(label="Cotizaciones", menu=cotizaciones_menu)
+
     root.config(menu=menubar)
 
     # Bienvenida
@@ -89,5 +98,6 @@ def start_main_window():
     ttk.Button(frame, text="Agregar Producto", command=lambda: mostrar_formulario_producto(root)).pack(pady=5)
     ttk.Button(frame, text="Registrar Factura", command=lambda: mostrar_formulario_factura(root)).pack(pady=5)
     ttk.Button(frame, text="Registrar Proveedor", command=lambda: mostrar_formulario_proveedor(root)).pack(pady=5)
+    ttk.Button(frame, text="Nueva Solicitud de Cotización", command=lambda: mostrar_formulario_solicitud(root)).pack(pady=5)
 
     root.mainloop()
