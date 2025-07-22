@@ -102,4 +102,13 @@ def actualizar_usuario_db(id_usuario, nombre, email, rol, activo, nueva_contrase
 
     conn.commit()
     cur.close()
-    
+
+def eliminar_usuario(id_usuario):
+    conn = DBConnection.get_instance().get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        DELETE FROM Usuario
+        WHERE id_usuario = %s
+    """, (id_usuario,))
+    conn.commit()
+    cur.close()

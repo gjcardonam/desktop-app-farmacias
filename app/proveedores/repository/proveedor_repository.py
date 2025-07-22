@@ -63,3 +63,13 @@ def obtener_proveedores():
         "telefono": r[3],
         "email": r[4]
     } for r in rows]
+    
+def eliminar_proveedor(proveedor_id):
+    conn = DBConnection.get_instance().get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        DELETE FROM Proveedor
+        WHERE id_proveedor = %s
+    """, (proveedor_id,))
+    conn.commit()
+    cur.close()

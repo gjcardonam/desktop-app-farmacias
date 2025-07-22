@@ -108,3 +108,12 @@ def insertar_producto(producto):
     conn.commit()
     cur.close()
     
+def eliminar_producto(producto_id):
+    conn = DBConnection.get_instance().get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        DELETE FROM Producto
+        WHERE id_producto = %s
+    """, (producto_id,))
+    conn.commit()
+    cur.close()

@@ -88,3 +88,22 @@ def insertar_factura_venta(id_cliente, productos, id_usuario):
     conn.commit()
     cur.close()
     return factura_id, total
+
+def eliminar_factura(factura_id):
+    conn = DBConnection.get_instance().get_connection()
+    cur = conn.cursor()
+    
+    # Primero eliminar los registros dependientes en DetalleVenta
+    cur.execute("""
+        DELETE FROM DetalleVenta
+        WHERE id_factura = %s
+    """, (factura_id,))
+    
+    # Luego eliminar la factura
+    cur.execute("""
+        DELETE FROM FacturaVenta
+        WHERE id_factura = %s
+    """, (factura_id,))
+    
+    conn.commit()
+    cur.close()

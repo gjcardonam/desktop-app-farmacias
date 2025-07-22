@@ -43,3 +43,13 @@ def insertar_cliente(cliente):
     )
     conn.commit()
     cur.close()
+    
+def eliminar_cliente(cliente):
+    conn = DBConnection.get_instance().get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "DELETE FROM Cliente WHERE documento = %s",
+        (cliente.documento,)
+    )
+    conn.commit()
+    cur.close()

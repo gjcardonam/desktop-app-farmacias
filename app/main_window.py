@@ -4,16 +4,21 @@ from tkinter import ttk
 from app.clientes.gui.listado_clientes import mostrar_listado_clientes
 from app.facturas.gui.factura_venta_form import mostrar_formulario_factura
 from app.facturas.gui.listado_facturas import mostrar_listado_facturas
+from app.facturas.gui.buscador_facturas import mostrar_buscador_facturas
 from app.farmacias.gui.farmacia_form import mostrar_formulario_farmacia
 from app.farmacias.gui.listado_farmacias import mostrar_listado_farmacias
+from app.farmacias.gui.buscador_farmacias import mostrar_buscador_farmacias
 from app.productos.gui.listado_productos import mostrar_listado_productos
 from app.productos.gui.producto_form import mostrar_formulario_producto
 from app.productos.gui.buscador_productos import mostrar_buscador_productos
 from app.usuarios.gui.listado_usuarios import mostrar_listado_usuarios
 from app.usuarios.gui.usuario_form import mostrar_formulario_usuario
+from app.usuarios.gui.buscador_usuarios import mostrar_buscador_usuarios
 from app.clientes.gui.cliente_form import mostrar_formulario_cliente
+from app.clientes.gui.buscador_clientes import mostrar_buscador_clientes
 from app.proveedores.gui.proveedor_form import mostrar_formulario_proveedor
 from app.proveedores.gui.listado_proveedores import mostrar_listado_proveedores
+from app.proveedores.gui.buscador_proveedores import mostrar_buscador_proveedores
 from utils.ui_utils import centrar_ventana, activar_enter_en_todos_los_botones, permitir_tab_en_botones, activar_enter_en_treeviews
 
 def start_main_window():
@@ -32,18 +37,21 @@ def start_main_window():
     usuarios_menu = tk.Menu(menubar, tearoff=0)
     usuarios_menu.add_command(label="Agregar Usuario", command=lambda: mostrar_formulario_usuario(root))
     usuarios_menu.add_command(label="Listar Usuarios", command=lambda: mostrar_listado_usuarios(root))
+    usuarios_menu.add_command(label="Buscar Usuario", command=lambda: mostrar_buscador_usuarios(root))
     menubar.add_cascade(label="Usuarios", menu=usuarios_menu)
 
     # Menú de Clientes
     clientes_menu = tk.Menu(menubar, tearoff=0)
     clientes_menu.add_command(label="Agregar Cliente", command=lambda: mostrar_formulario_cliente(root))
     clientes_menu.add_command(label="Listar Clientes", command=lambda: mostrar_listado_clientes(root))
+    clientes_menu.add_command(label="Buscar Cliente", command=lambda: mostrar_buscador_clientes(root))
     menubar.add_cascade(label="Clientes", menu=clientes_menu)
 
     # Menú de Farmacias
     farmacias_menu = tk.Menu(menubar, tearoff=0)
     farmacias_menu.add_command(label="Agregar Farmacia", command=lambda: mostrar_formulario_farmacia(root))
     farmacias_menu.add_command(label="Listar Farmacias", command=lambda: mostrar_listado_farmacias(root))
+    farmacias_menu.add_command(label="Buscar Farmacia", command=lambda: mostrar_buscador_farmacias(root))
     menubar.add_cascade(label="Farmacias", menu=farmacias_menu)
 
     # Menú de Productos
@@ -57,12 +65,14 @@ def start_main_window():
     ventas_menu = tk.Menu(menubar, tearoff=0)
     ventas_menu.add_command(label="Registrar Factura", command=lambda: mostrar_formulario_factura(root))
     ventas_menu.add_command(label="Listar Facturas", command=lambda: mostrar_listado_facturas(root))
+    ventas_menu.add_command(label="Buscar Factura", command=lambda: mostrar_buscador_facturas(root))
     menubar.add_cascade(label="Ventas", menu=ventas_menu)
 
     # Menú de Proveedores
     menu_proveedores = tk.Menu(menubar, tearoff=0)
     menu_proveedores.add_command(label="Registrar proveedor", command=lambda: mostrar_formulario_proveedor(root))
     menu_proveedores.add_command(label="Ver proveedores", command=lambda: mostrar_listado_proveedores(root))
+    menu_proveedores.add_command(label="Buscar Proveedor", command=lambda: mostrar_buscador_proveedores(root))
     menubar.add_cascade(label="Proveedores", menu=menu_proveedores)
 
     root.config(menu=menubar)

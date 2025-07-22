@@ -47,4 +47,13 @@ def insertar_farmacia(farmacia):
     """, (farmacia.nombre, farmacia.nit, farmacia.direccion, farmacia.telefono))
     conn.commit()
     cur.close()
-    
+
+def eliminar_farmacia(farmacia_id):
+    conn = DBConnection.get_instance().get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        DELETE FROM Farmacia
+        WHERE id_farmacia = %s
+    """, (farmacia_id,))
+    conn.commit()
+    cur.close()
